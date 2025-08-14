@@ -1,0 +1,17 @@
+version: "3.9"
+
+services:
+  postgres:
+    profiles:
+      - postgres
+      - all
+    image: postgres:14.7-alpine
+    environment:
+      POSTGRES_USER: kientv84
+      POSTGRES_PASSWORD: 123
+      POSTGRES_DB: dispatch_service
+      PGDATA: /data/postgres
+    volumes:
+      - ./postgres:/docker-entrypoint-initdb.d/
+    ports:
+      - "15800:5432"
