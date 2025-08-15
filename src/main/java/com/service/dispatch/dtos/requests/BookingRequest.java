@@ -1,4 +1,4 @@
-package dtos.requests;
+package com.service.dispatch.dtos.requests;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -10,5 +10,5 @@ import lombok.Setter;
 public class BookingRequest {
     private String startAt;
     private String endAt;
-    private String vehicleTye;
+    private String vehicleType;
 }

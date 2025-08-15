@@ -1,7 +1,7 @@
-package service.impls;
+package com.service.dispatch.service;
 
-import dtos.requests.BookingRequest;
-import dtos.respones.BookingResponse;
+import com.service.dispatch.dtos.requests.BookingRequest;
+import com.service.dispatch.dtos.respones.BookingResponse;
 
 public interface DispatchService {
     public BookingResponse createDispatch(BookingRequest bookingRequest);

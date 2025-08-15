@@ -1,14 +1,15 @@
-package entities;
+package com.service.dispatch.entities;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.Date;
 
 @Entity
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 @Table(name = "dispatch")
 public class DispatchEntity {
     @Id
