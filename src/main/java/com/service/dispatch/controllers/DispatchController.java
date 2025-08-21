@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.service.dispatch.service.DispatchService;
 
 @RestController
-@RequestMapping("/service")
+@RequestMapping("/v1/dispatch")
 @RequiredArgsConstructor
 public class DispatchController {
 
@@ -19,7 +19,7 @@ public class DispatchController {
     private final DispatchService dispatchService;
 
 
-    @PostMapping("/v1/dispatch/dispatches")
+    @PostMapping("/dispatches")
     public ResponseEntity<BookingResponse> createDispatch(@RequestBody BookingRequest bookingRequest) {
         return ResponseEntity.ok(dispatchService.createDispatch(bookingRequest));
     }

@@ -10,7 +10,7 @@ import java.util.Date;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "dispatch")
+//@Table(name = "dispatch")
 public class DispatchEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
