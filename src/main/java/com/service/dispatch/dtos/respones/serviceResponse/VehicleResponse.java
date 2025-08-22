@@ -26,6 +26,10 @@ public class VehicleResponse {
     VehicleTypeDTO vehicleType;
 
     List<DriverDTO> drivers;
+
+    Double latitude;
+
+    Double longitude;
 //    long vehicleType; // chứa ID
 //
 //    List<Long> drivers;

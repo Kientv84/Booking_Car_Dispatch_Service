@@ -88,12 +88,17 @@
 			<version>0.2.0</version>
 		</dependency>
 
-		<!-- https://mvnrepository.com/artifact/org.springframework.cloud/spring-cloud-starter-openfeign goi tu mot service khac -->
+		<!-- openfeign goi tu mot service khac -->
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-openfeign</artifactId>
 		</dependency>
 
+		<!-- Redis -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-redis</artifactId>
+		</dependency>
 	</dependencies>
 
 	<dependencyManagement>

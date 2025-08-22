@@ -8,7 +8,9 @@ import lombok.Setter;
 @Getter
 @AllArgsConstructor
 public class BookingRequest {
-    private String startAt;
-    private String endAt;
+//    private String startAt;
+//    private String endAt;
     private String vehicleType;
+    private Double startLatitude;     // tọa độ điểm xuất phát (vĩ độ)
+    private Double startLongitude;
 }

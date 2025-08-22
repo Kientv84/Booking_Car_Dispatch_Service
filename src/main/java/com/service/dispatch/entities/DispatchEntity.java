@@ -24,6 +24,10 @@ public class DispatchEntity {
 
     private String endAt;
 
+    Double latitude;
+
+    Double longitude;
+
     private String vehicleType;
 
     private String driver;

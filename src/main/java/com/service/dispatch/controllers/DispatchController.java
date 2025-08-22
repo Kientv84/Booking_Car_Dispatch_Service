@@ -2,6 +2,7 @@ package com.service.dispatch.controllers;
 
 import com.service.dispatch.dtos.requests.BookingRequest;
 import com.service.dispatch.dtos.respones.BookingResponse;
+import com.service.dispatch.dtos.respones.ResponseResults;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,7 +21,7 @@ public class DispatchController {
 
 
     @PostMapping("/dispatches")
-    public ResponseEntity<BookingResponse> createDispatch(@RequestBody BookingRequest bookingRequest) {
-        return ResponseEntity.ok(dispatchService.createDispatch(bookingRequest));
+    public ResponseResults createDispatch(@RequestBody BookingRequest bookingRequest) {
+        return dispatchService.createDispatch(bookingRequest);
     }
 }
