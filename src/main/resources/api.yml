@@ -1,0 +1,71 @@
+openapi: 3.0.1
+info:
+  title: Demo Swagger OpenAPI
+  version: v0
+  description: API cho việc quản lý người dùng.
+
+servers:
+  - url: http://localhost:3001/api
+    description: Generated server url
+
+
+
+paths:
+  "/v1/dispatch/dispatches":
+    post:
+      summary: Create dispatch!
+      tags:
+        - Dispatch
+      operationId: createDispatch
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequestBooking'
+      responses:
+        '200':
+          description: Tạo thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseResults'
+
+components:
+  schemas:
+    RequestBooking:
+      type: object
+      properties:
+        vehicleType:
+          type: string
+          example: Xe máy
+        startLatitude:
+          type: number
+          format: double
+          example: 10.123123
+        startLongitude:
+          type: number
+          format: double
+          example: 110.123123
+
+    ResponseResults:
+      type: object
+      required:
+        - success
+        - message
+        - dataVehicle
+        - dataDispatch
+      properties:
+        success:
+          type: integer
+        message:
+          type: string
+        dataVehicle:
+          type: array
+          items:
+            type: object
+        dataDispatch:
+          type: array
+          items:
+            type: object
+

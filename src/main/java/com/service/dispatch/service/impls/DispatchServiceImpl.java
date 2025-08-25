@@ -3,7 +3,9 @@ package com.service.dispatch.service.impls;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.service.dispatch.components.CronJobSchedule;
 import com.service.dispatch.dtos.respones.ResponseResults;
+import com.service.dispatch.dtos.respones.serviceResponse.DriverBookingRespone;
 import com.service.dispatch.dtos.respones.serviceResponse.VehicleResponse;
 import com.service.dispatch.integration.VehicleClient;
 import com.service.dispatch.mappers.DispatchMapper;
@@ -33,9 +35,11 @@ public class DispatchServiceImpl implements DispatchService {
     private final VehicleClient vehicleClient;
     private final RedisService redisService;
     private final ObjectMapper objectMapper;
+    private final CronJobSchedule cronJobSchedule;
 
     @Override
     public ResponseResults createDispatch(BookingRequest bookingRequest) {
+        log.info("Start get create dispatch ...");
 
             // Gọi service vehicle
             List<VehicleResponse> vehicles = Collections.emptyList();
@@ -46,7 +50,7 @@ public class DispatchServiceImpl implements DispatchService {
                     log.warn("Vehicle service returned empty list");
                     return new ResponseResults<>(SuccessCode.ERROR, "create dispatch fail - no vehicles available");
                 } else {
-                    log.info("Vehicle service called");
+                    log.info("Vehicle service called successfull!!");
                 }
             } catch (Exception e) {
                 log.warn("Get all from vehicle service failed!", e); // log cả stack trace
@@ -66,13 +70,39 @@ public class DispatchServiceImpl implements DispatchService {
 
         // B2: Lọc theo vị trí
 
-            VehicleResponse vehicleNeed = findVehiclesByLocation(bookingRequest.getStartLatitude(), bookingRequest.getStartLongitude(), filtered);
+        List<VehicleResponse> sortedVehicles = findVehiclesByLocation(bookingRequest.getStartLatitude(), bookingRequest.getStartLongitude(), filtered);
 
-        if (vehicleNeed == null) {
-            return new ResponseResults<>(SuccessCode.ERROR, "create dispatch fail - no vehicle found by location");
+        if (sortedVehicles.isEmpty()) {
+            return new ResponseResults<>(SuccessCode.ERROR,
+                    "create dispatch fail - no vehicle found by location");
         }
 
-        //
+
+        // Log danh sách xe và khoảng cách
+        sortedVehicles.forEach(vehicle ->
+                        log.info("VehicleId: {}, VehicleName: {}, Distance: {} km",
+                                vehicle.getVehicleId(),
+                                vehicle.getVehicleName(),
+                                calculateDistance(bookingRequest.getStartLatitude(), bookingRequest.getStartLongitude(), vehicle.getLatitude(), vehicle.getLongitude()))  // đảm bảo trong VehicleResponse có field distance
+                        );
+
+
+        // Lưu vào cache (Redis)
+
+        redisService.setValue("vehicles::all", sortedVehicles, 3600);
+
+        // --- Fake API driver reject xe ---
+
+        DriverBookingRespone driverDecision = cronJobSchedule.scheduleDriverDecision(sortedVehicles);
+
+        if (!driverDecision.isAccepted()) {
+            log.warn("Driver rejected booking");
+            return new ResponseResults<>(SuccessCode.ERROR,
+                    "create dispatch fail - No driver accept this booking");
+        }
+
+
+        // Nếu driver accept thì mới lưu DB && xóa cache
 
         DispatchEntity dispatch = new DispatchEntity();
 
@@ -84,7 +114,11 @@ public class DispatchServiceImpl implements DispatchService {
 
         BookingResponse disPatchResponse = dispatchMapper.mapToBookingEntity(newDispatch);
 
-        return new ResponseResults<>(SuccessCode.SUCCESS, "create dispatch success", vehicleNeed, disPatchResponse);
+        // xóa cache
+
+        redisService.deleteByKey("vehicles::all");
+
+        return new ResponseResults<>(SuccessCode.SUCCESS, "create dispatch success", driverDecision, disPatchResponse);
     }
 
     @Override
@@ -108,23 +142,21 @@ public class DispatchServiceImpl implements DispatchService {
         return R * c; // Tính ra km để so sánh
     }
 
-    // Tìm ra xe gần nhất
-    public VehicleResponse findVehiclesByLocation(Double latStart, Double longStart, List<VehicleResponse> vehicles) {
+    // Sắp xếp xe gần nhất
+    public List<VehicleResponse> findVehiclesByLocation(Double latStart, Double longStart, List<VehicleResponse> vehicles) {
         if (vehicles == null || vehicles.isEmpty()) {
-            return null;
+            return Collections.emptyList();
         }
 
-        // Tìm xe gần nhất
         return vehicles.stream()
-                .min((v1, v2) -> {
-                    double dist1 = calculateDistance(latStart, longStart,
-                            v1.getLatitude(), v1.getLongitude());
-                    double dist2 = calculateDistance(latStart, longStart,
-                            v2.getLatitude(), v2.getLongitude());
-                    return Double.compare(dist1, dist2);
+                .sorted((v1, v2) -> {
+                    double dist1 = calculateDistance(latStart, longStart, v1.getLatitude(), v1.getLongitude());
+                    double dist2 = calculateDistance(latStart, longStart, v2.getLatitude(), v2.getLongitude());
+                    return Double.compare(dist1, dist2); // nhỏ hơn thì gần hơn
                 })
-                .orElse(null);
+                .collect(Collectors.toList());
     }
+
 
 }
 
