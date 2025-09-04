@@ -91,15 +91,39 @@ public class DispatchServiceImpl implements DispatchService {
 
         redisService.setValue("vehicles::all", sortedVehicles, 3600);
 
-        // --- Fake API driver reject xe ---
+        // --- Gọi api driver ---
 
-        DriverBookingRespone driverDecision = cronJobSchedule.scheduleDriverDecision(sortedVehicles);
+        for (VehicleResponse vehicleResponse : sortedVehicles) {
 
-        if (!driverDecision.isAccepted()) {
-            log.warn("Driver rejected booking");
-            return new ResponseResults<>(SuccessCode.ERROR,
-                    "create dispatch fail - No driver accept this booking");
+            Long idDrvier = vehicleResponse.getVehicleId();
+
+            try {
+
+
+                Boolean isAccept = vehicleClient.isAcceptBooking(idDrvier, "pending" );
+
+                if ( isAccept != null ) {
+                    log.info("please wait driver" + vehicleResponse.getVehicleName() + " is response");
+                }
+
+                // Check status booking
+
+                if ( isAccept == true ) { return new ResponseResults<>(SuccessCode.SUCCESS, " Driver" + vehicleResponse.getVehicleName() + " is accepted"); }
+
+            } catch (Exception e) {
+                return new ResponseResults<>(SuccessCode.ERROR, "Call api driver fail with" + e.getMessage());
+            }
+
+
         }
+
+//        DriverBookingRespone driverDecision = cronJobSchedule.scheduleDriverDecision(sortedVehicles);
+//
+//        if (!driverDecision.isAccepted()) {
+//            log.warn("Driver rejected booking");
+//            return new ResponseResults<>(SuccessCode.ERROR,
+//                    "create dispatch fail - No driver accept this booking");
+//        }
 
 
         // Nếu driver accept thì mới lưu DB && xóa cache
