@@ -10,13 +10,19 @@ import lombok.*;
 public class ResponseResults<T> {
     private int success;
     private String message;
-    private T dataVehicle;
+    private T data;
     private T dataDispatch;
 
-    public ResponseResults(int success, T dataVehicle,  T dataDispatch) {
+    public ResponseResults(int success, T data,  T dataDispatch) {
         this.success = success;
-        this.dataVehicle = dataVehicle;
+        this.data = data;
         this.dataDispatch = getDataDispatch();
+    }
+
+    public ResponseResults(int success, String message, T data) {
+        this.success = success;
+        this.message = message;
+        this.data = data;
     }
 
     public ResponseResults(int success, String message) {

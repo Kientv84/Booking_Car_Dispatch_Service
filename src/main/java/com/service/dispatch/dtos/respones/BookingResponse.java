@@ -14,7 +14,7 @@ public class BookingResponse {
 //    private String vehicleName;
 //    private String licensePlate;
 //    private String driver;
-    private String vehicleType;
+    private Long vehicleType;
     private Double latitude;     // tọa độ điểm xuất phát (vĩ độ)
     private Double longitude;
 //    private String vehicleName;

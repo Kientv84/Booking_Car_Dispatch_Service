@@ -5,7 +5,7 @@ info:
   description: API cho việc quản lý người dùng.
 
 servers:
-  - url: http://localhost:3001/api
+  - url: http://localhost:3001
     description: Generated server url
 
 

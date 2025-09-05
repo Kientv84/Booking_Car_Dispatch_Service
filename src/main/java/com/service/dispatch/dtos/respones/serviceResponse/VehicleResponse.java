@@ -1,10 +1,12 @@
 package com.service.dispatch.dtos.respones.serviceResponse;
 
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -21,15 +23,16 @@ public class VehicleResponse {
 
     String status;
 
-    LocalDate signupDate;
+    @JsonFormat(pattern = "dd-MM-yyyy HH:mm:ss")
+    LocalDateTime signupDate;
 
-    VehicleTypeDTO vehicleType;
-
-    List<DriverDTO> drivers;
+    DriverDTO driver;
 
     Double latitude;
 
     Double longitude;
+
+    long vehicleType; // chứa ID
 //    long vehicleType; // chứa ID
 //
 //    List<Long> drivers;

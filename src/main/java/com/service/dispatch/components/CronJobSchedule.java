@@ -1,19 +1,13 @@
 package com.service.dispatch.components;
 
 
-import com.service.dispatch.FakeApi.FakeApi;
-import com.service.dispatch.dtos.requests.BookingRequest;
 import com.service.dispatch.dtos.respones.serviceResponse.DriverBookingRespone;
 import com.service.dispatch.dtos.respones.serviceResponse.VehicleResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
 
-import java.time.OffsetDateTime;
 import java.util.List;
 
 @Component
@@ -21,7 +15,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CronJobSchedule {
 
-    private  final FakeApi fakeApi;
+
 
     //  @Scheduled(cron = "${scheduler.interval}", zone = "${scheduler.interval.zone}") // Mỗi 5s 1
     // lần
@@ -56,22 +50,22 @@ public class CronJobSchedule {
 
     // Gọi apk fake ở đây
 
-    @Async
-    public DriverBookingRespone scheduleDriverDecision( List<VehicleResponse> vehicleResponse) {
-
-        log.info("Scheduled driver decision for bookingId={} with {} candidate vehicles", vehicleResponse.size());
-
-
-        try {
-            for (int i = 5; i > 0; i--) {
-                log.info("Countdown time to driver accept: {}", i);
-                Thread.sleep(1000); // dừng 1 giây mỗi lần
-            }
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
-
-        return fakeApi.conformBooking(vehicleResponse);
+//    @Async
+//    public DriverBookingRespone scheduleDriverDecision( List<VehicleResponse> vehicleResponse) {
+//
+//        log.info("Scheduled driver decision for bookingId={} with {} candidate vehicles", vehicleResponse.size());
+//
+//
+//        try {
+//            for (int i = 5; i > 0; i--) {
+//                log.info("Countdown time to driver accept: {}", i);
+//                Thread.sleep(1000);
+//            }
+//        } catch (InterruptedException e) {
+//            Thread.currentThread().interrupt();
+//        }
+//
+//        return fakeApi.conformBooking(vehicleResponse);
 //        RestTemplate restTemplate = new RestTemplate();
 //        String url = "http://localhost:3001/v1/driver/booking"; // endpoint của service driver
 //        ResponseEntity<DriverBookingRespone> response =
@@ -88,5 +82,5 @@ public class CronJobSchedule {
 //        response.setAccepted(accepted);
 //        return response;
 //    }
-}
+
 

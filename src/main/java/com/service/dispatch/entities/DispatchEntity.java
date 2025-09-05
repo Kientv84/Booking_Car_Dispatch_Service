@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Getter
@@ -28,7 +29,11 @@ public class DispatchEntity {
 
     Double longitude;
 
-    private String vehicleType;
+    List<String> driverCanceled;
+
+    private String vehicle;
+
+    private Long vehicleType;
 
     private String driver;
 

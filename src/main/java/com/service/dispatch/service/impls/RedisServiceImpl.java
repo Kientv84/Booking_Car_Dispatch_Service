@@ -2,6 +2,7 @@ package com.service.dispatch.service.impls;
 
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.service.dispatch.service.RedisService;
 import io.micrometer.common.util.StringUtils;
@@ -89,5 +90,20 @@ public class RedisServiceImpl implements RedisService {
             log.error(EROR_CONVERTING_MSG, e);
         }
     }
+
+    @Override
+    public <T> T getValue(String key, TypeReference<T> typeRef) {
+        T t = null;
+        try {
+            var dataJson = redisTemplate.opsForValue().get(key);
+            if (StringUtils.isNotEmpty(dataJson)) {
+                t = objectMapper.readValue(dataJson, typeRef);
+            }
+        } catch (JsonProcessingException e) {
+            log.error(EROR_CONVERTING_MSG, e);
+        }
+        return t;
+    }
+
 }
 
