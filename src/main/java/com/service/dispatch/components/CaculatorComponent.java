@@ -1,6 +1,7 @@
 package com.service.dispatch.components;
 
 import com.service.dispatch.dtos.respones.serviceResponse.VehicleResponse;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;

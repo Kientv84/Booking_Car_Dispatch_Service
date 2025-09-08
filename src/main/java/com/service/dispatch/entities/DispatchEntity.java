@@ -1,5 +1,6 @@
 package com.service.dispatch.entities;
 
+import com.service.dispatch.utils.StatusEnum;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -17,31 +18,32 @@ public class DispatchEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-//    private String bookingId;
+    private Long bookingId;
 
 //    private String customerId;
 
-    private String startAt;  // { lưu bằng tọa độ GPS "lat": 10.762622, "lng": 106.660172}
-
-    private String endAt;
+//    private String startAt;  // { lưu bằng tọa độ GPS "lat": 10.762622, "lng": 106.660172}
+//
+//    private String endAt;
 
     Double latitude;
 
     Double longitude;
 
-    List<String> driverCanceled;
+//    List<String> driverCanceled;
 
-    private String vehicle;
+    private Long vehicleId;
 
-    private Long vehicleType;
+//    private Long vehicleType;
 
-    private String driver;
+    private Long driverId;
 
-    private String status;
+    @Enumerated(EnumType.STRING) // @Emuerated giúp hiểu lưu kiể enum ntn, có 2 cách Enumtype.ORIGINAL -> lưu index, Enumtype.String lưu kiểu string
+    private StatusEnum status; // enum
 
     private Date createdAt;
 
     private Date updatedAt;
-
-    private Date expireAt;
+//
+//    private Date expireAt;
 }

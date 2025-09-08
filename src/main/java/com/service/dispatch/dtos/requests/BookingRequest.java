@@ -10,6 +10,7 @@ import lombok.Setter;
 public class BookingRequest {
 //    private String startAt;
 //    private String endAt;
+    private Long bookingId;
     private Long vehicleType;
     private Double startLatitude;     // tọa độ điểm xuất phát (vĩ độ)
     private Double startLongitude;
