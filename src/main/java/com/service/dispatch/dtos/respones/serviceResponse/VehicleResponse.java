@@ -23,16 +23,23 @@ public class VehicleResponse {
 
     String status;
 
-    @JsonFormat(pattern = "dd-MM-yyyy HH:mm:ss")
-    LocalDateTime signupDate;
-
+//    @JsonFormat(pattern = "dd-MM-yyyy HH:mm:ss")
+//    LocalDateTime signupDate;
+//
     DriverDTO driver;
-
+//
     Double latitude;
 
     Double longitude;
 
     long vehicleType; // chứa ID
+
+    public VehicleResponse(Long vehicleId, String vehicleName, String licensePlate) {
+        this.vehicleId = vehicleId;
+        this.vehicleName = vehicleName;
+        this.licensePlate = licensePlate;
+    }
+
 //    long vehicleType; // chứa ID
 //
 //    List<Long> drivers;

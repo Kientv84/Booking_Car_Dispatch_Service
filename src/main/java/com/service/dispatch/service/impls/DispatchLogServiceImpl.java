@@ -22,13 +22,21 @@ public class DispatchLogServiceImpl implements DispatchLogService {
 
         dispatchLogEntity.setBookingId(bookingResponse.getBookingId());
         dispatchLogEntity.setStatus(bookingResponse.getStatus());
-        dispatchLogEntity.setDriverId(bookingResponse.getDriverId());
+//        dispatchLogEntity.setDriverId(bookingResponse.getDriver().getDriverId());
         dispatchLogEntity.setDispatchId(bookingResponse.getDispatchId());
-        dispatchLogEntity.setVehicleId(bookingResponse.getVehicleId());
+//        dispatchLogEntity.setVehicleId(bookingResponse.getVehicle().getVehicleId());
         dispatchLogEntity.setCycle(cyle);
 
-        DispatchLogEntity respone = dispatchLogRepository.save(dispatchLogEntity);
+        if (bookingResponse.getDriver() != null) {
+            dispatchLogEntity.setDriverId(bookingResponse.getDriver().getDriverId());
+        }
 
-        return ResponseEntity.ok(respone);
+        if (bookingResponse.getVehicle() != null) {
+            dispatchLogEntity.setVehicleId(bookingResponse.getVehicle().getVehicleId());
+        }
+
+        DispatchLogEntity response = dispatchLogRepository.save(dispatchLogEntity);
+
+        return ResponseEntity.ok(response);
     }
 }

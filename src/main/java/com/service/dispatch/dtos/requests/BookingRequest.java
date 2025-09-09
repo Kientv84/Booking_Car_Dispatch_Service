@@ -14,4 +14,6 @@ public class BookingRequest {
     private Long vehicleType;
     private Double startLatitude;     // tọa độ điểm xuất phát (vĩ độ)
     private Double startLongitude;
+    private Double endLatitude;     // tọa độ điểm kết thúc (vĩ độ)
+    private Double endLongitude;
 }
