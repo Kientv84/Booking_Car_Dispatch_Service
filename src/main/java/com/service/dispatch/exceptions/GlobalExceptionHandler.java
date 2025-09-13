@@ -2,8 +2,11 @@ package com.service.dispatch.exceptions;
 
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContext;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -49,6 +52,8 @@ public class GlobalExceptionHandler {
         Map<String, String> response =
                 new HashMap<>(); // Vậy khi lấy được key của ex thì tiến hành băm key đó thành một số (
         // hashcode ) để thực hiện lưu tạm thời
+
+        messageSource.getMessage("D001", null, LocaleContextHolder.getLocale()); // get message LocaleContextHolder
 
         response.put("Internal sever error: ", ex.getMessage());
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);

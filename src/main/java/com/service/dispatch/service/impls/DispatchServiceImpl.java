@@ -47,10 +47,25 @@ public class DispatchServiceImpl implements DispatchService {
     private final CaculatorComponent caculatorComponent;
     private final DispatchCreator dispatchCreator;
 
+
     private final DispatchLogService dispatchLogService;
 
     @Override
-    public ResponseEntity<BookingResponse> createDispatch(BookingRequest bookingRequest) {
+    public BookingResponse createDispatch(BookingRequest bookingRequest) {
+
+        //TODO 1 : default tạo 1 record với status Pending ....
+
+        DispatchEntity dispatchEntityData = initDispatch(bookingRequest).getBody();
+
+        //TODO 2 : Lưu log cho lần dispatch này ....
+
+        BookingResponse mapToSaveLog = dispatchMapper.mapToBookingEntity(dispatchEntityData);
+        log.info("Ghi log lần đầu");
+
+        dispatchLogService.createLog(mapToSaveLog, 0);
+
+        //TODO 3 : Update lại Dispatch entity Gọi api create Dispatch thực hiện logic gọi tài xế ....
+
         try {
             List<VehicleResponse> vehicleDispatch = redisService.getValue(
                     "vehicles::dispatch",
@@ -63,8 +78,7 @@ public class DispatchServiceImpl implements DispatchService {
                         new TypeReference<List<VehicleResponse>>() {}
                 );
                 if (vehicleAll == null || vehicleAll.isEmpty()) {
-                    return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                            .body(new BookingResponse( null, null,  null, null, null, null, null, "No vehicles available in Redis"));
+                    return new BookingResponse( null, null,  null, null, null, null, null, "No vehicles available in Redis");
                 }
 
                 vehicleDispatch = new ArrayList<>(vehicleAll);
@@ -91,9 +105,8 @@ public class DispatchServiceImpl implements DispatchService {
                         .collect(Collectors.toList());
 
                 if (filtered.isEmpty()) {
-                    return ResponseEntity.badRequest()
-                            .body(new BookingResponse( null, null, null, null, null, null, null,
-                                    "No vehicle matched type: " + bookingRequest.getVehicleType()));
+                    return new BookingResponse( null, null, null, null, null, null, null,
+                                    "No vehicle matched type: " + bookingRequest.getVehicleType());
                 }
 
                 // Filter theo location
@@ -104,9 +117,8 @@ public class DispatchServiceImpl implements DispatchService {
                 );
 
                 if (sortedVehicles.isEmpty()) {
-                    return ResponseEntity.badRequest()
-                            .body(new BookingResponse( null, null, null, null, null, null, null,
-                                    "No vehicle available after location filter"));
+                    return new BookingResponse( null, null, null, null, null, null, null,
+                                    "No vehicle available after location filter");
                 }
 
                 VehicleResponse firstVehicle = sortedVehicles.get(0);
@@ -119,6 +131,9 @@ public class DispatchServiceImpl implements DispatchService {
 
                     if (Boolean.TRUE.equals(isAccept)) {
                         // Driver accept --> Luu db
+
+                       updateDispatch(dispatchEntityData);
+
                        BookingResponse response = dispatchCreator.createDispatch(bookingRequest, firstVehicle, StatusEnum.ACCEPTED);
                         redisService.deleteByKey("vehicles::dispatch");
 
@@ -135,11 +150,16 @@ public class DispatchServiceImpl implements DispatchService {
                         } catch (Exception e) {
                             log.info("Have err" + e.getMessage());
                         }
+                        mapToSaveLog.setStatus(StatusEnum.ACCEPT);
 
-                        return ResponseEntity.ok(response);
+                        return response;
                     } else {
                         // Driver reject → remove khỏi list
                         vehicleDispatch.removeIf(v -> v.getVehicleId().equals(firstVehicle.getVehicleId()));
+
+
+                        dispatchEntityData.setStatus(StatusEnum.REJECTED);
+                        updateDispatch(dispatchEntityData);
 
                         // Ghi log
 
@@ -163,27 +183,23 @@ public class DispatchServiceImpl implements DispatchService {
 
                         if (vehicleDispatch.isEmpty()) {
                             redisService.deleteByKey("vehicles::dispatch");
-                            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                                    .body(new BookingResponse(  null, null, null,  null, null, null, null, "No driver accepted booking"));
+                            return new BookingResponse(  null, null, null,  null, null, null, null, "No driver accepted booking");
                         }
 
                         cycle++;
                     }
 
                 } catch (Exception e) {
-                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                            .body(new BookingResponse(  null, null, null, null, null, null, null,
-                                    "Error while calling driver API: " + e.getMessage()));
+                    return new BookingResponse(  null, null, null, null, null, null, null,
+                                    "Error while calling driver API: " + e.getMessage());
                 }
             }
 
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new BookingResponse(  null, null, null, null, null, null, null, "No driver accepted booking"));
+            return new BookingResponse(  null, null, null, null, null, null, null, "No driver accepted booking");
 
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new BookingResponse( null, null, null, null, null,  null, null,
-                            "Error while processing dispatch: " + e.getMessage()));
+            return new BookingResponse( null, null, null, null, null,  null, null,
+                            "Error while processing dispatch: " + e.getMessage());
         }
     }
 
@@ -208,6 +224,21 @@ public class DispatchServiceImpl implements DispatchService {
 
         return ResponseEntity.ok(dispatchEntity);
 
+    }
+
+    public DispatchEntity updateDispatch(DispatchEntity dispatchEntityData) {
+        // Tìm record theo id
+        DispatchEntity existing = dispatchRepository.findById(dispatchEntityData.getId())
+                .orElseThrow(() -> new RuntimeException("Dispatch not found"));
+
+        // Cập nhật các trường cần update
+        existing.setStatus(dispatchEntityData.getStatus());
+//        existing.setDriverId(dispatchEntityData.getDriverId());
+//        existing.setLatitude(dispatchEntityData.getLatitude());
+//        existing.setLongitude(dispatchEntityData.getLongitude());
+
+        // Lưu lại (sẽ gọi UPDATE chứ không phải INSERT)
+        return dispatchRepository.save(existing);
     }
 }
 

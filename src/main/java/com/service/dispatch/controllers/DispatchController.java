@@ -30,20 +30,9 @@ public class DispatchController {
 //    }
 
     @PostMapping("/job")
-    public ResponseEntity createJob(@RequestBody BookingRequest bookingRequest) {
-        //TODO 1 : default tạo 1 record với status Pending ....
+    public ResponseEntity<BookingResponse> createJob(@RequestBody BookingRequest bookingRequest) {
 
-        DispatchEntity dispatchEntityData = dispatchService.initDispatch(bookingRequest).getBody();
-
-        //TODO 2 : Lưu log cho lần dispatch này ....
-
-        BookingResponse mapToSaveLog = dispatchMapper.mapToBookingEntity(dispatchEntityData);
-
-        dispatchLogService.createLog(mapToSaveLog, 0);
-
-        //TODO 3 : Update lại Dispatch entity Gọi api create Dispatch thực hiện logic gọi tài xế ....
-
-        return dispatchService.createDispatch(bookingRequest);
+        return ResponseEntity.ok(dispatchService.createDispatch(bookingRequest));
     }
 }
 
