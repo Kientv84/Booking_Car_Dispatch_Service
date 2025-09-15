@@ -21,13 +21,13 @@ public class VehicleResponse {
 
     String licensePlate;
 
-    String status;
+//    String status;
 
 //    @JsonFormat(pattern = "dd-MM-yyyy HH:mm:ss")
 //    LocalDateTime signupDate;
 //
     DriverDTO driver;
-//
+
     Double latitude;
 
     Double longitude;

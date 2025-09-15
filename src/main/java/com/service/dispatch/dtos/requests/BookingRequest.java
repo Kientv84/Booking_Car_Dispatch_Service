@@ -1,5 +1,7 @@
 package com.service.dispatch.dtos.requests;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -8,12 +10,15 @@ import lombok.Setter;
 @Getter
 @AllArgsConstructor
 public class BookingRequest {
-//    private String startAt;
-//    private String endAt;
+
+    @NotNull(message = "{booking.id.notnull}")
     private Long bookingId;
+    @NotNull(message = "{vehicle.type.notnull}")
     private Long vehicleType;
-    private Double startLatitude;     // tọa độ điểm xuất phát (vĩ độ)
+    @NotNull(message = "{start.latitude.notnull}")
+    private Double startLatitude;
+    @NotNull(message = "{start.longitude.notnull}")
     private Double startLongitude;
-    private Double endLatitude;     // tọa độ điểm kết thúc (vĩ độ)
+    private Double endLatitude;
     private Double endLongitude;
 }

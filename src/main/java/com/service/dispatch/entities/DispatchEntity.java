@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.util.Date;
 import java.util.List;
@@ -15,6 +16,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 //@Table(name = "dispatch")
+@EntityListeners(AuditingEntityListener.class)
 public class DispatchEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

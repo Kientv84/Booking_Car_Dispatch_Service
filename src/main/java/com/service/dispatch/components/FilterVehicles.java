@@ -1,12 +1,7 @@
 package com.service.dispatch.components;
 
 import com.service.dispatch.dtos.requests.BookingRequest;
-import com.service.dispatch.dtos.respones.ResponseResults;
 import com.service.dispatch.dtos.respones.serviceResponse.VehicleResponse;
-import com.service.dispatch.utils.SuccessCode;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;

@@ -20,7 +20,7 @@ public class DispatchLogEntity {
 
     private Long dispatchId;
 
-    @Column(unique = true, updatable = false)
+    @Column( updatable = false)
     private Long bookingId;
 
     private Long vehicleId;

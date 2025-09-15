@@ -3,6 +3,7 @@ package com.service.dispatch.service;
 import com.service.dispatch.dtos.requests.BookingRequest;
 import com.service.dispatch.dtos.respones.BookingResponse;
 import com.service.dispatch.dtos.respones.ResponseResults;
+import com.service.dispatch.dtos.respones.serviceResponse.VehicleResponse;
 import com.service.dispatch.entities.DispatchEntity;
 import com.service.dispatch.entities.DispatchLogEntity;
 import com.service.dispatch.utils.StatusEnum;
@@ -15,7 +16,7 @@ public interface DispatchService {
 
      BookingResponse getDispatchById(Long id);
 
-     DispatchEntity updateDispatch(DispatchEntity dispatchEntity);
+     DispatchEntity updateDispatch(DispatchEntity dispatchEntityData, BookingRequest bookingRequest, VehicleResponse vehicleResponse, StatusEnum statusEnum);
 
      ResponseEntity<DispatchEntity> initDispatch(BookingRequest bookingRequest);
 
