@@ -12,22 +12,30 @@ import java.util.stream.Collectors;
 public class FilterVehicles {
 
     public List<VehicleResponse> filterVehicles(List<VehicleResponse> vehicles, BookingRequest bookingRequest) {
-        // B1: Lọc theo type
+        if (vehicles == null || vehicles.isEmpty() || bookingRequest == null) {
+            return Collections.emptyList();
+        }
+
+        // B1: Lọc theo vehicleType (primitive long → so sánh trực tiếp)
         List<VehicleResponse> filtered = vehicles.stream()
-                .filter(v -> bookingRequest.getVehicleType().equals(v.getVehicleType()))
+                .filter(v -> v.getVehicleType() == bookingRequest.getVehicleType())
                 .collect(Collectors.toList());
 
         if (filtered.isEmpty()) {
-            return filtered;
+            return filtered; // trả về empty list nếu không có xe cùng type
         }
 
         // B2: Lọc và sắp xếp theo vị trí
-        List<VehicleResponse> sortedVehicles =
-                findVehiclesByLocation(bookingRequest.getStartLatitude(), bookingRequest.getStartLongitude(), filtered);
+        List<VehicleResponse> sortedVehicles = findVehiclesByLocation(
+                bookingRequest.getStartLatitude(),
+                bookingRequest.getStartLongitude(),
+                filtered
+        );
 
-        // Trả về danh sách đã sắp xếp (có thể empty nếu không tìm được xe nào phù hợp)
-        return sortedVehicles;
+        return sortedVehicles != null ? sortedVehicles : Collections.emptyList();
     }
+
+
 
     // Sắp xếp xe gần nhất
     public List<VehicleResponse> findVehiclesByLocation(Double latStart, Double longStart, List<VehicleResponse> vehicles) {

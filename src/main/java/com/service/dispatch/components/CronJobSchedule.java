@@ -1,14 +1,9 @@
 package com.service.dispatch.components;
 
 
-import com.service.dispatch.dtos.respones.serviceResponse.DriverBookingRespone;
-import com.service.dispatch.dtos.respones.serviceResponse.VehicleResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
 
 @Component
 @Slf4j

@@ -3,6 +3,9 @@ package com.service.dispatch.service.impls;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.service.dispatch.components.CaculatorComponent;
 import com.service.dispatch.components.DispatchCreator;
+import com.service.dispatch.dtos.respones.DispatchInitData;
+import com.service.dispatch.dtos.respones.DispatchResponse;
+import com.service.dispatch.dtos.respones.VehicleDispatch;
 import com.service.dispatch.dtos.respones.serviceResponse.DriverDTO;
 import com.service.dispatch.dtos.respones.serviceResponse.VehicleResponse;
 import com.service.dispatch.exceptions.DispatchServiceException;
@@ -14,6 +17,7 @@ import com.service.dispatch.dtos.respones.BookingResponse;
 import com.service.dispatch.entities.DispatchEntity;
 import com.service.dispatch.service.DispatchLogService;
 import com.service.dispatch.service.RedisService;
+import com.service.dispatch.utils.DispatchError;
 import com.service.dispatch.utils.StatusEnum;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,10 +43,11 @@ public class DispatchServiceImpl implements DispatchService {
 
     private final DispatchLogService dispatchLogService;
 
-    @Override
-    public BookingResponse createDispatch(BookingRequest bookingRequest) {
 
-        DispatchEntity dispatchEntityData = initDispatch(bookingRequest).getBody();
+    @Override
+    public DispatchResponse createDispatch(BookingRequest bookingRequest) {
+
+        DispatchEntity dispatchEntityData = initDispatch(bookingRequest);
 
         BookingResponse mapToSaveLog = dispatchMapper.mapToBookingEntity(dispatchEntityData);
         log.info("Ghi log lần đầu");
@@ -61,7 +66,7 @@ public class DispatchServiceImpl implements DispatchService {
                         new TypeReference<List<VehicleResponse>>() {}
                 );
                 if (vehicleAll == null || vehicleAll.isEmpty()) {
-                    throw new DispatchServiceException("D001", "D001");
+                    throw new DispatchServiceException(DispatchError.D001);
                 }
 
                 // chỉ chạy khi vehicleAll != null
@@ -87,7 +92,7 @@ public class DispatchServiceImpl implements DispatchService {
                         .collect(Collectors.toList());
 
                 if (filtered.isEmpty()) {
-                    throw new DispatchServiceException("D002", "D002");
+                    throw new DispatchServiceException(DispatchError.D002);
                 }
 
                 List<VehicleResponse> sortedVehicles = caculatorComponent.findVehiclesByLocation(
@@ -97,7 +102,7 @@ public class DispatchServiceImpl implements DispatchService {
                 );
 
                 if (sortedVehicles.isEmpty()) {
-                    throw new DispatchServiceException("D003", "D003");
+                    throw new DispatchServiceException(DispatchError.D003);
                 }
 
                 VehicleResponse firstVehicle = sortedVehicles.get(0);
@@ -108,10 +113,14 @@ public class DispatchServiceImpl implements DispatchService {
 
                     if (Boolean.TRUE.equals(isAccept)) {
 
+                        log.info("Successfully found the driver {}", firstVehicle.getDriver().getName());
+
                         //dispatchEntityData
 
+                         DispatchEntity updated = updateDispatch( dispatchEntityData,bookingRequest, firstVehicle,   StatusEnum.ACCEPTED);
 
-                        BookingResponse response =  dispatchMapper.mapToBookingEntity(updateDispatch( dispatchEntityData,bookingRequest, firstVehicle,   StatusEnum.ACCEPTED));
+
+                        BookingResponse response =  dispatchMapper.mapToBookingEntity(updated);
 
                         redisService.deleteByKey("vehicles::dispatch");
 
@@ -121,6 +130,8 @@ public class DispatchServiceImpl implements DispatchService {
                                 firstVehicle.getVehicleName(),
                                 firstVehicle.getLicensePlate()));
 
+                        DispatchResponse dispatchResponse = dispatchMapper.mapFromBookingResponse(response);
+
                         try {
                             dispatchLogService.createLog(response, cycle);
                         } catch (Exception e) {
@@ -128,19 +139,29 @@ public class DispatchServiceImpl implements DispatchService {
                         }
                         mapToSaveLog.setStatus(StatusEnum.ACCEPT);
 
-                        return response;
+                        return dispatchResponse;
                     } else {
+
+                        log.info("Please wait driver accept!!");
+
                         vehicleDispatch.removeIf(v -> v.getVehicleId().equals(firstVehicle.getVehicleId()));
 
                         updateDispatch(dispatchEntityData, null, null, StatusEnum.REJECTED);
 
                         BookingResponse response = new BookingResponse();
                         response.setBookingId(bookingRequest.getBookingId());
-                        response.setDriver(new DriverDTO(firstVehicle.getDriver().getDriverId(),
-                                firstVehicle.getDriver().getName()));
-                        response.setVehicle(new VehicleResponse(firstVehicle.getVehicleId(),
+                        response.setDispatchId(dispatchEntityData.getId());
+
+                        DriverDTO driverDTO = new DriverDTO(firstVehicle.getDriver().getDriverId(),
+                                firstVehicle.getDriver().getName());
+
+                        response.setDriver(driverDTO);
+
+                        VehicleResponse vehicleResponse = new VehicleResponse(firstVehicle.getVehicleId(),
                                 firstVehicle.getVehicleName(),
-                                firstVehicle.getLicensePlate()));
+                                firstVehicle.getLicensePlate());
+
+                        response.setVehicle(vehicleResponse);
                         response.setStatus(StatusEnum.REJECTED);
 
                         try {
@@ -153,27 +174,24 @@ public class DispatchServiceImpl implements DispatchService {
 
                         if (vehicleDispatch.isEmpty()) {
                             redisService.deleteByKey("vehicles::dispatch");
-                            throw new DispatchServiceException("D004", "D004");
+                            throw new DispatchServiceException(DispatchError.D004);
                         }
                         cycle++;
                     }
 
                 } catch (Exception e) {
-                    throw new DispatchServiceException("D005", "D005");
+                    throw new DispatchServiceException(DispatchError.D005);
                 }
             }
 
-            throw new DispatchServiceException("D004", "D004");
+            throw new DispatchServiceException(DispatchError.D004);
 
         } catch (DispatchServiceException e) {
             throw e;
         } catch (Exception e) {
-            throw new DispatchServiceException("D006", "D006");
+            throw new DispatchServiceException(DispatchError.D006);
         }
     }
-
-
-
 
 
 
@@ -182,9 +200,12 @@ public class DispatchServiceImpl implements DispatchService {
         return null;
     }
 
-    @Override
-    public ResponseEntity<DispatchEntity> initDispatch( BookingRequest bookingRequest) {
+
+
+    private DispatchEntity initDispatch( BookingRequest bookingRequest) {
         // init 1 record into db
+
+        log.info("Creating the first Dispatch record that has status pending");
 
         DispatchEntity dispatch = new DispatchEntity();
 
@@ -194,12 +215,16 @@ public class DispatchServiceImpl implements DispatchService {
         DispatchEntity dispatchEntity = dispatchRepository.save(dispatch);
 
 
-        return ResponseEntity.ok(dispatchEntity);
+        return dispatchEntity;
 
     }
 
-    public DispatchEntity updateDispatch(DispatchEntity dispatchEntityData, BookingRequest bookingRequest, VehicleResponse vehicleResponse, StatusEnum statusEnum) {
+
+    private DispatchEntity updateDispatch(DispatchEntity dispatchEntityData, BookingRequest bookingRequest, VehicleResponse vehicleResponse, StatusEnum statusEnum) {
         // Tìm record theo id
+
+        log.info("Starting update dispatch id {} with status {}", dispatchEntityData.getId(), statusEnum);
+
         DispatchEntity existing = dispatchRepository.findById(dispatchEntityData.getId())
                 .orElseThrow(() -> new RuntimeException("Dispatch not found"));
 
@@ -218,11 +243,6 @@ public class DispatchServiceImpl implements DispatchService {
             existing.setStatus(statusEnum);
         }
 
-        // Cập nhật các trường cần update
-        existing.setStatus(dispatchEntityData.getStatus());
-//
-
-        // Lưu lại (sẽ gọi UPDATE chứ không phải INSERT)
         return dispatchRepository.save(existing);
     }
 }

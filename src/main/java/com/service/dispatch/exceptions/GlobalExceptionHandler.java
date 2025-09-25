@@ -1,5 +1,6 @@
 package com.service.dispatch.exceptions;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -14,15 +15,11 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+@RequiredArgsConstructor
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
     private final MessageSource messageSource;
-
-    @Autowired
-    public GlobalExceptionHandler(MessageSource messageSource) {
-        this.messageSource = messageSource;
-    }
 
     /**
      * Xử lý lỗi validate (@Valid, @NotNull...)
@@ -75,7 +72,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, Object>> handleGeneralException(Exception ex) {
         Locale locale = LocaleContextHolder.getLocale();
-        String defaultMessage = messageSource.getMessage("D001", null, locale); // "D001=Not found vehicle"
+        String defaultMessage = messageSource.getMessage( "D006", // fallback "Error while processing dispatch"
+                null,
+                "Unexpected error occurred",
+                locale
+        );
 
         Map<String, Object> response = new HashMap<>();
         response.put("timestamp", LocalDateTime.now());

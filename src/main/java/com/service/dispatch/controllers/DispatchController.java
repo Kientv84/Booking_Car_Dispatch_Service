@@ -1,10 +1,7 @@
 package com.service.dispatch.controllers;
 
 import com.service.dispatch.dtos.requests.BookingRequest;
-import com.service.dispatch.dtos.respones.BookingResponse;
-import com.service.dispatch.dtos.respones.ResponseResults;
-import com.service.dispatch.entities.DispatchEntity;
-import com.service.dispatch.entities.DispatchLogEntity;
+import com.service.dispatch.dtos.respones.DispatchResponse;
 import com.service.dispatch.mappers.DispatchMapper;
 import com.service.dispatch.service.DispatchLogService;
 import jakarta.validation.Valid;
@@ -31,7 +28,7 @@ public class DispatchController {
 //    }
 
     @PostMapping("/job")
-    public ResponseEntity<BookingResponse> createJob( @Valid @RequestBody BookingRequest bookingRequest) {
+    public ResponseEntity<DispatchResponse> createJob(@Valid @RequestBody BookingRequest bookingRequest) {
 
         return ResponseEntity.ok(dispatchService.createDispatch(bookingRequest));
     }

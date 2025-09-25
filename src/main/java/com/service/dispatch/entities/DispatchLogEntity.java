@@ -2,6 +2,7 @@ package com.service.dispatch.entities;
 
 import com.service.dispatch.utils.StatusEnum;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,7 +18,7 @@ public class DispatchLogEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
-
+    
     private Long dispatchId;
 
     @Column( updatable = false)

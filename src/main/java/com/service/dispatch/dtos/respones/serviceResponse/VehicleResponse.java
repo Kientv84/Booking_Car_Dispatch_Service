@@ -9,7 +9,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -38,6 +39,17 @@ public class VehicleResponse {
         this.vehicleId = vehicleId;
         this.vehicleName = vehicleName;
         this.licensePlate = licensePlate;
+    }
+
+    // --- Inner static class DriverDTO ---
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class DriverDTO {
+        private Long driverId;
+        private String name;
     }
 
 //    long vehicleType; // chứa ID
