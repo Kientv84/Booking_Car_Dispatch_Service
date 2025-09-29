@@ -1,5 +1,6 @@
 package com.service.dispatch.integration;
 
+import com.service.dispatch.dtos.respones.ApiResponse;
 import com.service.dispatch.dtos.respones.serviceResponse.VehicleResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
@@ -20,5 +21,5 @@ public interface VehicleClient {
             value = "${openfeign.vehicleClient.url.driver-conform}",
             consumes = "application/json")
 //    ResponseEntity<Boolean> isAcceptBooking(@PathVariable Long driverId, @RequestParam String action);
-    Boolean isAcceptBooking(@PathVariable Long driverId, @RequestParam String action);
+    ResponseEntity<ApiResponse<Boolean>> isAcceptBooking(@PathVariable Long driverId, @RequestParam String action);
 }

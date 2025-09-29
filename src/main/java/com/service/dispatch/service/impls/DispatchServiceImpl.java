@@ -3,9 +3,7 @@ package com.service.dispatch.service.impls;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.service.dispatch.components.CaculatorComponent;
 import com.service.dispatch.components.DispatchCreator;
-import com.service.dispatch.dtos.respones.DispatchInitData;
-import com.service.dispatch.dtos.respones.DispatchResponse;
-import com.service.dispatch.dtos.respones.VehicleDispatch;
+import com.service.dispatch.dtos.respones.*;
 import com.service.dispatch.dtos.respones.serviceResponse.DriverDTO;
 import com.service.dispatch.dtos.respones.serviceResponse.VehicleResponse;
 import com.service.dispatch.exceptions.DispatchServiceException;
@@ -13,7 +11,6 @@ import com.service.dispatch.integration.VehicleClient;
 import com.service.dispatch.mappers.DispatchMapper;
 import com.service.dispatch.repositories.DispatchRepository;
 import com.service.dispatch.dtos.requests.BookingRequest;
-import com.service.dispatch.dtos.respones.BookingResponse;
 import com.service.dispatch.entities.DispatchEntity;
 import com.service.dispatch.service.DispatchLogService;
 import com.service.dispatch.service.RedisService;
@@ -109,7 +106,9 @@ public class DispatchServiceImpl implements DispatchService {
 
                 try {
                     String action = (cycle == 3) ? "accept" : "reject";
-                    Boolean isAccept = vehicleClient.isAcceptBooking(firstVehicle.getVehicleId(), action);
+                    ApiResponse<Boolean> responseApi = vehicleClient.isAcceptBooking(firstVehicle.getVehicleId(), action).getBody();
+
+                    Boolean isAccept = responseApi.getResult();
 
                     if (Boolean.TRUE.equals(isAccept)) {
 
