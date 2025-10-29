@@ -15,9 +15,11 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+
 @RequiredArgsConstructor
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
 
     private final MessageSource messageSource;
 
@@ -79,10 +81,10 @@ public class GlobalExceptionHandler {
         );
 
         Map<String, Object> response = new HashMap<>();
-        response.put("timestamp", LocalDateTime.now());
-        response.put("status", HttpStatus.INTERNAL_SERVER_ERROR.value());
-        response.put("error", "Internal Server Error");
-        response.put("message", defaultMessage + " | " + ex.getMessage());
+        response.put(Constant.TIMESTAMP, LocalDateTime.now());
+        response.put(Constant.STATUS, HttpStatus.INTERNAL_SERVER_ERROR.value());
+        response.put(Constant.ERROR, Constant.INTERNAL_SERVER_ERROR);
+        response.put(Constant.MESSAGE, "%s | %s".formatted(defaultMessage, ex.getMessage()));
 
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
     }
