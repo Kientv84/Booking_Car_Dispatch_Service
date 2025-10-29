@@ -52,7 +52,7 @@ public class GlobalExceptionHandler {
 
         // Lấy message từ messageSource dựa vào messageCode
         String localizedMessage = messageSource.getMessage(
-                ex.getMessageCode(),
+                ex.getErrorCode(),
                 null,
                 locale
         );

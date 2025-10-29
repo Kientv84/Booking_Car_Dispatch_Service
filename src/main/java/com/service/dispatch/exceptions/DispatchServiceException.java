@@ -16,7 +16,7 @@ public class DispatchServiceException extends  RuntimeException {
     private final Object[] args;
 
     public DispatchServiceException(DispatchError error) {
-        this(error, error.name().toLowerCase(), null);
+        this(error, error.name(), null);
         // ví dụ: "d001" => messages.properties phải có key "d001"
     }
 

@@ -18,7 +18,6 @@ public class MessageSourceConfig {
         ReloadableResourceBundleMessageSource messageSource =
                 new ReloadableResourceBundleMessageSource();
         messageSource.setBasename("classpath:language/message");
-        // Nhiều file vd: "classpath:language/messages_account", "classpath:language/messages_user"
         messageSource.setDefaultEncoding("UTF-8");
         return messageSource;
     }
