@@ -1,6 +1,5 @@
 package com.service.dispatch.dtos.respones;
 
-
 import com.service.dispatch.dtos.respones.serviceResponse.DriverDTO;
 import com.service.dispatch.dtos.respones.serviceResponse.VehicleResponse;
 import com.service.dispatch.utils.StatusEnum;
@@ -13,13 +12,13 @@ import lombok.Setter;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class BookingResponse {
-private Long bookingId;
+public class DispatchResponse {
     private Long dispatchId;
     private Double latitude;
     private Double longitude;
     private StatusEnum status;
     private DriverDTO driver;
-    private VehicleResponse vehicle;
+    private VehicleDispatch vehicle;
     private String message;
 }
+

@@ -2,12 +2,12 @@ package com.service.dispatch.service;
 
 import com.service.dispatch.dtos.requests.BookingRequest;
 import com.service.dispatch.dtos.respones.BookingResponse;
-import com.service.dispatch.dtos.respones.ResponseResults;
+import com.service.dispatch.dtos.respones.DispatchResponse;
 
 public interface DispatchService {
-    public ResponseResults createDispatch(BookingRequest bookingRequest);
+     DispatchResponse createDispatch(BookingRequest bookingRequest);
 
-    public BookingResponse getDispatchById(Long id);
+     BookingResponse getDispatchById(Long id);
 
 
 }

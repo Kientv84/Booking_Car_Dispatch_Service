@@ -1,9 +1,14 @@
 package com.service.dispatch.entities;
 
+import com.service.dispatch.utils.StatusEnum;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Getter
@@ -11,32 +16,33 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 //@Table(name = "dispatch")
+@EntityListeners(AuditingEntityListener.class)
 public class DispatchEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-//    private String bookingId;
-
-//    private String customerId;
-
-    private String startAt;  // { lưu bằng tọa độ GPS "lat": 10.762622, "lng": 106.660172}
-
-    private String endAt;
+    @Column(unique = true)
+    private Long bookingId;
 
     Double latitude;
 
     Double longitude;
 
-    private String vehicleType;
+    private Long vehicleId;
 
-    private String driver;
+    private Long driverId;
 
-    private String status;
+    @Enumerated(EnumType.STRING) // @Emuerated giúp hiểu lưu kiể enum ntn, có 2 cách Enumtype.ORIGINAL -> lưu index, Enumtype.String lưu kiểu string
+    private StatusEnum status; // enum
 
+    @CreatedDate
+    @Column(updatable = false)
     private Date createdAt;
 
+    @Column(updatable = false)
+    @LastModifiedDate
     private Date updatedAt;
-
-    private Date expireAt;
 }
+
+//Sửa lại lưu dispatch entity chỉ lưu 1 record. hiện tại ang 4 record,
